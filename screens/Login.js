@@ -9,7 +9,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 
-import firebase from "../firebase";
+import { auth } from "../firebase";
 
 const Login = (props) => {
   const [username, setUsername] = useState("");
@@ -23,8 +23,7 @@ const Login = (props) => {
       Alert.alert("Email and password required");
     } else {
       setIsLoading(true);
-      firebase
-        .auth()
+      auth
         .signInWithEmailAndPassword(email, password)
         .then((res) => {
           setIsLoading(false);

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Audio } from "expo-av";
+import { firestore } from "../firebase";
 
 const TrackContext = React.createContext();
 
@@ -52,12 +53,7 @@ const audioBookPlaylist = [
 ];
 
 const TrackProvider = (props) => {
-  const [trackState, setTrackState] = useState({
-    trackList: [],
-    currentIndex: 0,
-    volume: 1.0,
-    isBuffering: false,
-  });
+  const [trackList, setTrackList] = useState([]);
 
   useEffect(() => {
     const audioSetup = async () => {
@@ -73,14 +69,24 @@ const TrackProvider = (props) => {
     };
     audioSetup();
 
-    setTrackState({
-      ...trackState,
-      trackList: audioBookPlaylist,
-    });
-  }, [trackState.trackList]);
+    const unsubscribe = firestore
+      .collection("tracks")
+      .orderBy("id")
+      .onSnapshot((snapshot) => {
+        const trackList = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setTrackList(trackList);
+      });
+
+    console.log(trackList);
+
+    return unsubscribe;
+  }, []);
 
   return (
-    <TrackContext.Provider value={[trackState, setTrackState]}>
+    <TrackContext.Provider value={trackList}>
       {props.children}
     </TrackContext.Provider>
   );

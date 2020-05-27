@@ -9,7 +9,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 
-import firebase from "../firebase";
+import { auth } from "../firebase";
 
 const SignUp = (props) => {
   const [username, setUsername] = useState("");
@@ -23,8 +23,7 @@ const SignUp = (props) => {
       Alert.alert("Email and password required");
     } else {
       setIsLoading(true);
-      firebase
-        .auth()
+      auth
         .createUserWithEmailAndPassword(email, password)
         .then((res) => {
           res.user.updateProfile({ displayName: username });
@@ -41,7 +40,6 @@ const SignUp = (props) => {
   };
 
   if (isLoading) {
-    
     return (
       <View>
         <ActivityIndicator size="large" color="#33333" />
